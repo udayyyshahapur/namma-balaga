@@ -33,5 +33,4 @@ export async function POST(req: Request) {
     .values(values)
     .returning({ id: user.id, email: user.email, name: user.name });
 
-  return NextResponse.json(u, { status: 201 });
-}
+  return NextResponse.json({ user: u, message: "Account created" }, { status: 201 });}

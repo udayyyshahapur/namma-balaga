@@ -1,44 +1,61 @@
 "use client";
-import { useState } from "react";
+
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
 import { Button } from "@components/Button";
 import { Input } from "@components/Input";
 import { Label } from "@components/Label";
 import { Card, CardTitle, CardFooter } from "@components/Card";
+import { AlertSuccess, AlertError } from "@components/Alert";
+import { useSignIn } from "@/features/auth/queries";
 
 export default function SignInContainer() {
-  const [err, setErr] = useState<string | null>(null);
   const router = useRouter();
+  const emailRef = useRef<HTMLInputElement>(null);
+  const passRef = useRef<HTMLInputElement>(null);
+
+  const { mutateAsync, isPending } = useSignIn();
+  const [msg, setMsg] = useState<string | null>(null);
+  const [err, setErr] = useState<string | null>(null);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const f = e.currentTarget;
-    const email = (f.elements.namedItem("email") as HTMLInputElement).value;
-    const password = (f.elements.namedItem("password") as HTMLInputElement).value;
+    setMsg(null); setErr(null);
 
-    const res = await signIn("credentials", { email, password, redirect: false });
-    if (res?.error) setErr(res.error);
-    else router.push("/dashboard");
+    const email = emailRef.current?.value?.trim() ?? "";
+    const password = passRef.current?.value ?? "";
+
+    try {
+      const res = await mutateAsync({ email, password });
+      setMsg(res.message ?? "Signed in");
+      router.push("/dashboard");
+    } catch (e: any) {
+      setErr(e.message ?? "Invalid credentials");
+    }
   }
 
   return (
     <div className="min-h-[60vh] grid place-items-center p-6">
       <Card className="w-full max-w-md">
         <CardTitle>Sign in</CardTitle>
+        {msg && <AlertSuccess>{msg}</AlertSuccess>}
+        {err && <AlertError>{err}</AlertError>}
         <form onSubmit={onSubmit} className="space-y-3">
           <div>
             <Label htmlFor="email">Email</Label>
-            <Input id="email" name="email" type="email" placeholder="you@example.com" required />
+            <Input id="email" ref={emailRef} type="email" placeholder="you@example.com" required />
           </div>
           <div>
             <Label htmlFor="password">Password</Label>
-            <Input id="password" name="password" type="password" placeholder="••••••••" required />
+            <Input id="password" ref={passRef} type="password" placeholder="••••••••" required />
           </div>
-          <Button type="submit" className="w-full">Sign in</Button>
+          <Button type="submit" className="w-full" disabled={isPending}>
+            {isPending ? "Signing in…" : "Sign in"}
+          </Button>
         </form>
         <CardFooter>
-          {err ? <span className="text-red-600">{err}</span> : <>New here? <a className="text-blue-600 underline ml-1" href="/auth/sign-up">Create an account</a></>}
+          New here?{" "}
+          <a className="text-blue-600 underline ml-1" href="/auth/sign-up">Create an account</a>
         </CardFooter>
       </Card>
     </div>
