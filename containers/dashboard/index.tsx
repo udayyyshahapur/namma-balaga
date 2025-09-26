@@ -70,6 +70,13 @@ export default function DashboardClient() {
 
   return (
     <div className="mx-auto max-w-3xl p-6 space-y-6">
+      <div className="flex items-center justify-between mb-4">
+        <h1 className="text-2xl font-semibold">Your Dashboard</h1>
+        <a href="/profile" className="inline-flex items-center rounded-md border px-3 py-1.5 text-sm hover:bg-gray-50">
+          Profile
+        </a>
+      </div>
+
       <h1 className="text-2xl font-semibold">Your Families</h1>
 
       {message && <AlertSuccess>{message}</AlertSuccess>}
@@ -93,7 +100,14 @@ export default function DashboardClient() {
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="font-medium">{f.name}</div>
-                      <div className="text-xs text-gray-600">Role: {f.role} • Join code: {f.joinCode}</div>
+                      <div className="text-xs text-gray-600">
+                        Role: {f.role} • Join code: {f.joinCode}
+                        {f.personId ? (
+                          <span className="ml-2 inline-block px-2 py-0.5 rounded bg-green-100 text-green-800">Claimed</span>
+                        ) : (
+                          <a className="ml-2 underline" href={`/families/${f.id}/claim`}>Claim yourself</a>
+                        )}
+                      </div>
                     </div>
                     <div className="flex gap-2">
                       <a href={`/families/${f.id}`} className="px-3 py-2 rounded-md border hover:bg-black/5">Open</a>

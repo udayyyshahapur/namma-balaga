@@ -3,7 +3,7 @@ import { Card, CardTitle } from "@components/Card";
 
 export default function LandingContainer() {
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
+    <main className="min-h-screen">
       {/* Nav */}
       <header className="mx-auto max-w-6xl px-6 py-6 flex items-center justify-between">
         <Link href="/" className="text-xl font-semibold tracking-tight">

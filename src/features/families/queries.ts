@@ -2,7 +2,13 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { fetchJSON } from "@/lib/http";
 
 export type Role = "OWNER" | "STEWARD" | "MEMBER";
-export type Family = { id: number; name: string; joinCode: string; role: Role };
+export type Family = {
+  id: number;
+  name: string;
+  joinCode: string;
+  role: Role;
+  personId: number | null;
+};
 
 const keys = {
   families: ["families"] as const,

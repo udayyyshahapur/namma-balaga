@@ -10,11 +10,13 @@ function parseId(param?: string) {
   return id;
 }
 
-export async function PATCH(_req: Request, { params }: { params: { id: string } }) {
+export async function PATCH(_req: Request, ctx: { params: Promise<{ id: string }> }) {
   const session = await getServerSession(authOptions);
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  
+  const { id } = await ctx.params;
   const userId = Number((session.user as any).id);
-  const familyId = parseId(params.id);
+  const familyId = parseId(id);
 
   const bodySchema = z.object({ name: z.string().min(2).max(80) });
   const parsed = bodySchema.safeParse(await _req.json());
@@ -30,15 +32,16 @@ export async function PATCH(_req: Request, { params }: { params: { id: string } 
   }
 }
 
-export async function DELETE(_req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(_req: Request,  ctx: { params: Promise<{ id: string }> }) {
   const { searchParams } = new URL(_req.url);
   const hard = searchParams.get("hard") === "true";
 
   const session = await getServerSession(authOptions);
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  const { id } = await ctx.params;
   const userId = Number((session.user as any).id);
-  const familyId = parseId(params.id);
+  const familyId = parseId(id);
 
   try {
     if (hard) {
